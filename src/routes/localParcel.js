@@ -40,7 +40,7 @@ router.get("/users/:userid/parcels", (req, res) => {
   res.json(userParcels);
 });
 
-router.put("/parcels/:parcelId/cancel", async(req, res) => {
+router.put("/parcels/:parcelId/cancel", async (req, res) => {
   const parcelId = parseInt(req.params.parcelId);
   const singleParcelData = parcels.find((p) => p.id === parcelId);
   if (!singleParcelData)
