@@ -1,23 +1,29 @@
 import express from "express";
-import {} from "dotenv/config"
-import {Pool} from "pg";
+import {} from "dotenv/config";
+import { Pool } from "pg";
 
-import {router as localParcel} from "./routes/localParcel"
+import { router as localParcel } from "./routes/localParcel";
 
-import {router as auth} from "./routes/auth";
+import { router as auth } from "./routes/auth";
 
-const app = express()
-app.use(express.json())
+const app = express();
+app.use(express.json());
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3000;
 // const pool = new Pool({
 //     connectionString: process.env.DATABASE_URL
 // })
 
 app.use("/v1/localParcel", localParcel);
-app.use("/v1/auth", auth)
+app.use("/v1/auth", auth);
 
+if (!process.env.jwtPrivateKey) {
+  console.error("jwtPrivateKey is not defined in env variable");
+  process.exit(1);
+}
 // pool.on('connect', ()=> {
 //     console.log("Postgres Database Connected");
 // })
-app.listen(port, ()=>{console.log(`App started on port ${port}`)})
+app.listen(port, () => {
+  console.log(`App started on port ${port}`);
+});

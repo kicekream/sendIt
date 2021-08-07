@@ -12,12 +12,11 @@ pool.on('connect', ()=> {
 });
 module.exports = pool;
 
-/* 
+
 const poolConnect = async() => {
     const client = await pool.connect();
     try{
         await client.query('BEGIN');
-        await models(client);
         await client.query('COMMIT');
     }
     catch (error) {
@@ -27,4 +26,5 @@ const poolConnect = async() => {
     finally {
         client.release();
     }
-}; */
+};
+poolConnect()
