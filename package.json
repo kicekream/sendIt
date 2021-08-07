@@ -15,7 +15,12 @@
     "@babel/node": "^7.14.7",
     "@babel/preset-env": "^7.14.8",
     "@babel/runtime": "^7.14.8",
-    "express": "^4.17.1"
+    "bcrypt": "^5.0.1",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "joi": "^17.4.2",
+    "node-postgres": "^0.6.2",
+    "pg": "^8.7.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.8",

@@ -28,10 +28,10 @@ function _rytFyl() {
           case 0:
             _context.prev = 0;
             _context.next = 3;
-            return _fs["default"].promises.writeFile("".concat(dir, "/parcel.json"), data);
+            return _fs["default"].promises.writeFile("".concat(dir, "/parcelDB.json"), data);
 
           case 3:
-            return _context.abrupt("return", data);
+            return _context.abrupt("return", "File");
 
           case 6:
             _context.prev = 6;

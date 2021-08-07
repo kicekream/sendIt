@@ -1,6 +1,5 @@
-const Joi = require("joi")
+import Joi from "joi";
 
-// firstname, lastname, email, password
 function validateUserReg(userReg) {
     const schema = Joi.object({
         firstname: Joi.string().min(1).max(50).required(),
@@ -19,3 +18,4 @@ function validateUserLogin(userLogin) {
     return schema.validate(userLogin)
 };
 
+export {validateUserLogin, validateUserReg};
