@@ -1,7 +1,6 @@
 import express from "express";
-import Joi from "joi";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+
 
 import pool from "../database/modelIndex";
 

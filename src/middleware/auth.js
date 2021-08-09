@@ -6,6 +6,8 @@ function auth(req, res, next) {
 
     try {
         const decoded = jwt.verify(token, process.env.jwtPrivateKey)
+
+        //this contains user_id, email and isAdmin
         req.user = decoded;
         next();
     }
