@@ -6,11 +6,13 @@
   "scripts": {
     "test": "jest --watchAll --verbose --coverage --maxWorkers=1",
     "build": "babel src -d dist",
-    "start": "nodemon --exec babel-node src/index.js"
+    "start": "nodemon --exec babel-node src/index.js",
+    "heroku-postbuild": "npm install --production"
   },
   "engines": {
     "node": "12.18.3"
   },
+  
   "keywords": [],
   "author": "",
   "license": "ISC",
