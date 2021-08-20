@@ -12,7 +12,6 @@
   "engines": {
     "node": "12.18.3"
   },
-  
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -26,6 +25,7 @@
     "joi": "^17.4.2",
     "jsonwebtoken": "^8.5.1",
     "node-postgres": "^0.6.2",
+    "nodemon": "^2.0.12",
     "pg": "^8.7.1"
   },
   "devDependencies": {
