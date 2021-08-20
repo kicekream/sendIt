@@ -1,30 +1,14 @@
-import {Pool} from "pg";
-import {} from "dotenv/config"
+import { Pool } from "pg";
+import {} from "dotenv/config";
 
 // import models from "./models";
 
-let connect = {connectionString: process.env.DATABASE_URL}
+const string = process.env.NODE_ENV === 'test'
+? process.env.TEST_DATABASE_URL
+: process.env.DATABASE_URL;
 
-const pool  = new Pool(connect)
+let connect = { connectionString: string };
 
-pool.on('connect', ()=> {
-    console.log(`Database connected successfully`)
-});
+const pool = new Pool(connect);
+
 module.exports = pool;
-
-
-const poolConnect = async() => {
-    const client = await pool.connect();
-    try{
-        await client.query('BEGIN');
-        await client.query('COMMIT');
-    }
-    catch (error) {
-        await client.query('ROLLBACK');
-        console.log(`Error from modelIndex:${error}`);
-    }
-    finally {
-        client.release();
-    }
-};
-poolConnect()

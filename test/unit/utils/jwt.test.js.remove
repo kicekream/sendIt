@@ -1,0 +1,19 @@
+const { generateAuthToken } = require("../../../src/utils/jwt");
+const jwt = require("jsonwebtoken");
+const {} = require("dotenv/config");
+
+describe("generateAuthToken", () => {
+  it("Should return a valid JWT", () => {
+      const ada = true
+    const user = {
+      user_id: 1,
+      email: "a",
+      isadmin: true
+    }
+
+    const token = generateAuthToken(user);
+    const decoded = jwt.verify(token, process.env.jwtPrivateKey);
+
+    expect(decoded).toMatchObject({ user_id: 1, email: "a", isAdmin: true });
+  });
+});

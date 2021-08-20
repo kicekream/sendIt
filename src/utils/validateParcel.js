@@ -6,7 +6,7 @@ function validateParcelInfo(parcelInfo) {
     receiverPhone: Joi.string().min(2).max(50).required(),
     parcelOrigin: Joi.string().min(2).max(255).required(),
     parcelDestination: Joi.string().min(2).max(255).required(),
-    parcelNote: Joi.string().min(2).max(255),
+    parcelNote: Joi.string().min(1).max(255),
   });
   return schema.validate(parcelInfo);
 }
