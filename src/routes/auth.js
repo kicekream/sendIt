@@ -8,6 +8,8 @@ import { generateAuthToken } from "../utils/jwt";
 
 import { auth } from "../middleware/auth";
 
+import User from "../database/models/user";
+
 const router = express.Router();
 router.use(express.json());
 
@@ -17,24 +19,36 @@ router.post("/signup", async (req, res) => {
 
   let { firstname, lastname, email, password } = req.body;
   try {
-    const { rows } = await pool.query(
-      "SELECT email FROM users WHERE email = $1",
-      [email]
-    );
-    if (rows.length >= 1) return res.status(400).send("User already exists");
+    const user = await User.findOne({
+      attributes: ["email"],
+      where: {
+        email: email,
+      },
+    });
+
+    if (user) return res.status(400).send("User already exists");
   } catch (err) {
-    console.log(`Error verifying User existence`);
+    console.log(`Error verifying User existence ${err}`);
     res.status(500).send("Something failed, Error verifying user existence");
   }
   const salt = await bcrypt.genSalt(10);
   password = await bcrypt.hash(password, salt);
 
-  const { rows } = await pool.query(
-    "INSERT INTO users (firstname, lastname, email, password) VALUES ($1, $2, $3, $4) RETURNING user_id, email, isAdmin",
-    [firstname, lastname, email, password]
-  );
-  const token = generateAuthToken(rows[0]);
-  res.header("x-auth-token", token).send(rows[0]);
+  const user = await User.create({
+    firstname,
+    lastname,
+    email,
+    password,
+  });
+
+  const userToken = {
+    user_id: user.user_id,
+    email: user.email,
+    isadmin: user.isadmin,
+  };
+
+  const token = generateAuthToken(userToken);
+  res.header("x-auth-token", token).send(userToken);
 });
 
 router.post("/login", async (req, res) => {
@@ -43,19 +57,27 @@ router.post("/login", async (req, res) => {
     if (error) return res.status(400).send(error.details[0].message);
 
     const { email, password } = req.body;
-    const { rows } = await pool.query(
-      "SELECT user_id, email, password, isAdmin FROM users WHERE email = $1",
-      [email]
-    );
+    const user = await User.findOne({
+      attributes: ["user_id", "email", "password", "isadmin"],
+      where: {
+        email: email,
+      },
+    });
 
-    if (rows.length === 0 || email !== rows[0].email)
-      return res.status(400).send("Invalid email provideds");
+    if (!user || email !== user.email)
+      return res.status(400).send("Invalid email provided");
 
-    const compPassword = await bcrypt.compare(password, rows[0].password);
+    const compPassword = await bcrypt.compare(password, user.password);
     if (!compPassword)
       return res.status(400).send("Incorrect password provided");
 
-    const token = generateAuthToken(rows[0]);
+    const userToken = {
+      user_id: user.user_id,
+      email: user.email,
+      isadmin: user.isadmin,
+    };
+
+    const token = generateAuthToken(userToken);
 
     res.header("x-auth-token", token).send("logged in");
   } catch (error) {

@@ -2,6 +2,8 @@ import express from "express";
 
 import pool from "../database/modelIndex";
 
+import Parcel from "../database/models/parcel";
+
 import {
   validateParcelInfo,
   validateParcelDestination,
@@ -11,16 +13,13 @@ import {
 import { auth } from "../middleware/auth";
 import { admin } from "../middleware/admin";
 
-
 const router = express.Router();
 router.use(express.json());
 
-router.get("/", auth, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const { rows } = await pool.query(
-      "SELECT * FROM parcels "
-    );
-    res.send(rows);
+    const parcels = await Parcel.findAll();
+    res.send(parcels);
   } catch (error) {
     console.log(error);
     res.status(500).send("Something failed");
@@ -28,18 +27,15 @@ router.get("/", auth, async (req, res) => {
 });
 
 router.get("/:parcelId", auth, async (req, res) => {
-  const {parcelId} = req.params;
+  const { parcelId } = req.params;
 
   try {
-    const { rows } = await pool.query(
-      "SELECT * FROM parcels WHERE parcel_id=$1",
-      [parcelId]
-    );
-    
-    if (!rows[0])
+    const parcelData = await Parcel.findByPk(parcelId);
+
+    if (!parcelData)
       return res.status(404).send("Parcel with specified ID not found");
 
-    if (req.user.user_id !== rows[0].parcel_user_id) {
+    if (req.user.user_id !== parcelData.parcel_user_id) {
       return res
         .status(403)
         .send(
@@ -47,7 +43,7 @@ router.get("/:parcelId", auth, async (req, res) => {
         );
     }
 
-    res.send(rows);
+    res.send(parcelData);
   } catch (err) {
     console.log(err);
     return res.status(500).send("Something failed");
@@ -66,21 +62,21 @@ router.post("/", auth, async (req, res) => {
     parcelNote,
   } = req.body;
 
+  const parcelData = {
+    receiver_name: receiverName,
+    receiver_phone: receiverPhone,
+    parcel_origin: parcelOrigin,
+    parcel_destination: parcelDestination,
+    parcel_note: parcelNote,
+    parcel_user_id: req.user.user_id,
+    parcel_status_id: 1,
+  };
   try {
-    const { rows } = await pool.query(
-      "INSERT INTO parcels (receiver_name, receiver_phone, parcel_origin, parcel_destination, parcel_note, parcel_user_id, parcel_status_id) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *",
-      [
-        receiverName,
-        receiverPhone,
-        parcelOrigin,
-        parcelDestination,
-        parcelNote,
-        req.user.user_id,
-        1,
-      ]
-    );
+    const newParcel = await Parcel.create(parcelData);
 
-    res.status(201).json({Message: "Parcel order Successfully Created", data: rows });
+    res
+      .status(201)
+      .json({ Message: "Parcel order Successfully Created", data: newParcel });
   } catch (error) {
     console.log(error);
     res.status(500).send("Something failed");
@@ -94,26 +90,29 @@ router.put("/:parcelId/status", [auth, admin], async (req, res) => {
     return res.status(400).send("Status ID must be a number between 1 and 4");
 
   try {
-    const { rows } = await pool.query(
-      "SELECT parcel_id, parcel_user_id, parcel_destination FROM parcels where parcel_id = $1",
-      [parcelId]
-    );
+    const parcelData = await Parcel.findOne({
+      attributes: ["parcel_id", "parcel_user_id", "parcel_destination"],
+      where: {
+        parcel_id: parcelId,
+      },
+    });
 
-    // if (req.user.isAdmin !== true) {
-    //   return res.status(403).send("Access denied.");
-    // }
-    if (!rows[0])
+    if (!parcelData)
       return res.status(404).send("Parcel with specified ID not found");
   } catch (err) {
-    return res.status(400).send("Error updating parcel info with specified ID");
+    return res.status(400).send(`Error updating parcel info with specified ID`);
   }
 
   try {
-    const {rows} = await pool.query(
-      "UPDATE parcels SET parcel_status_id = $1 WHERE parcel_id = $2 RETURNING *",
-      [req.body.parcelStatus, parcelId]
+    const parcelData = await Parcel.update(
+      { parcel_status_id: req.body.parcelStatus },
+      {
+        where: {
+          parcel_id: parcelId,
+        },
+      }
     );
-    res.send(rows[0]);
+    res.send(`Status updated successfully`);
   } catch (error) {
     console.log(error);
     res.status(500).send("Error Updating, Something failed");
@@ -128,22 +127,29 @@ router.put("/:parcelId/presentlocation", [auth, admin], async (req, res) => {
   const { presentLocation } = req.body;
 
   try {
-    const { rows } = await pool.query(
-      "SELECT parcel_id, parcel_user_id, parcel_destination FROM parcels where parcel_id = $1",
-      [parcelId]
-    );
-    if (!rows[0])
-    return res.status(404).send("Parcel with specified ID not found");
+    const parcelData = await Parcel.findOne({
+      attributes: ["parcel_id", "parcel_user_id", "present_location"],
+      where: {
+        parcel_id: parcelId,
+      },
+    });
+
+    if (!parcelData)
+      return res.status(404).send("Parcel with specified ID not found");
   } catch (err) {
-    return res.status(400).send("Error updating parcel info with specified ID");
+    return res.status(400).send(`Error updating parcel info with specified ID`);
   }
 
   try {
-    const {rows} = await pool.query(
-      "UPDATE parcels SET present_location = $1 WHERE parcel_id = $2 RETURNING *",
-      [presentLocation, parcelId]
+    const parcelData = await Parcel.update(
+      { present_location: presentLocation },
+      {
+        where: {
+          parcel_id: parcelId,
+        },
+      }
     );
-    res.send(rows[0]);
+    res.send(`Parcel Location updated`);
   } catch (error) {
     console.log(error);
     res.status(500).send("Error Updating, Something failed");
@@ -158,11 +164,13 @@ router.put("/:parcelId/destination", auth, async (req, res) => {
   const { parcelDestination } = req.body;
 
   try {
-    const { rows } = await pool.query(
-      "SELECT parcel_id, parcel_user_id, parcel_destination FROM parcels where parcel_id = $1",
-      [parcelId]
-    );
-    if (req.user.user_id != rows[0].parcel_user_id) {
+    const parcelData = await Parcel.findOne({
+      attributes: ["parcel_id", "parcel_user_id", "parcel_destination"],
+      where: {
+        parcel_id: parcelId,
+      },
+    });
+    if (req.user.user_id != parcelData.parcel_user_id) {
       return res
         .status(403)
         .send(
@@ -170,41 +178,52 @@ router.put("/:parcelId/destination", auth, async (req, res) => {
         );
     }
   } catch (err) {
-    return res.status(404).send("Error fetching parcel with specified ID");
+    return res
+      .status(404)
+      .send(`Error fetching parcel with specified ID ${err}`);
   }
-  const {rows} = await pool.query(
-    "UPDATE parcels SET parcel_destination = $1 WHERE parcel_id = $2 RETURNING *",
-    [parcelDestination, parcelId]
+  const parcelData = await Parcel.update(
+    { parcel_destination: parcelDestination },
+    {
+      where: {
+        parcel_id: parcelId,
+      },
+    }
   );
-  res.send(rows[0]);
+  res.send(`Parcel Destination Updated`);
 });
 
 router.put("/:parcelId/cancel", auth, async (req, res) => {
   const parcelId = req.params.parcelId;
 
   try {
-    const { rows } = await pool.query(
-      "SELECT parcel_id, parcel_user_id, parcel_destination FROM parcels where parcel_id = $1",
-      [parcelId]
-    );
+    const parcelData = await Parcel.findOne({
+      attributes: ["parcel_id", "parcel_user_id", "parcel_status_id"],
+      where: {
+        parcel_id: parcelId,
+      },
+    });
 
-    if (!rows[0])
-    return res.status(404).send("Parcel with specified ID not found");
+    if (!parcelData)
+      return res.status(404).send("Parcel with specified ID not found");
 
-    if (req.user.user_id !== rows[0].parcel_user_id) {
+    if (req.user.user_id !== parcelData.parcel_user_id) {
       return res.status(403).send("Access denied.");
     }
-    
   } catch (err) {
     return res.status(400).send("Error fetching parcel with specified ID");
   }
 
   try {
-    const {rows} = await pool.query(
-      "UPDATE parcels SET parcel_status_id = $1 WHERE parcel_id = $2 RETURNING *",
-      [4, parcelId]
+    const parcelData = await Parcel.update(
+      { parcel_status_id: 4 },
+      {
+        where: {
+          parcel_id: parcelId,
+        },
+      }
     );
-    res.send(rows[0]);
+    res.send(parcelData);
   } catch (error) {
     console.log(error);
     res.status(500).send("Something failed");

@@ -1,16 +1,28 @@
-import { Pool } from "pg";
+// import { Pool } from "pg";
 import {} from "dotenv/config";
+import { Sequelize } from "sequelize";
 
-// import models from "./models";
-
-const string =
+const connectionString =
   process.env.NODE_ENV === "test"
     ? process.env.TEST_DATABASE_URL
     : process.env.DATABASE_URL;
 
-let connect = { connectionString: string, 
-    ssl: { rejectUnauthorized: false } };
+// let connect = { connectionString,
+//     ssl: { rejectUnauthorized: false } };
 
-const pool = new Pool(connect);
+const sequelize = new Sequelize(connectionString);
 
-module.exports = pool;
+async function sequelizeConnect() {
+  try {
+    await sequelize.authenticate();
+    console.log(`Sequelize connection established`);
+  } catch (error) {
+    console.error(`Unable to connect to the database ${error}`);
+  }
+}
+
+sequelizeConnect()
+
+// const pool = new Pool(connect);
+
+module.exports = sequelize;
