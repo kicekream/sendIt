@@ -1,10 +1,18 @@
 import { Sequelize, Model, DataTypes } from "sequelize";
 import sequelize from "../modelIndex";
 
-const Status = sequelize.define("status", {
-  status_id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-  status_name: { type: DataTypes.STRING(30), allowNull: false },
-}, {freezeTableName: true, timestamps: false});
+const Status = sequelize.define(
+  "status",
+  {
+    status_id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    status_name: { type: DataTypes.STRING(30), allowNull: false },
+  },
+  { freezeTableName: true, timestamps: false }
+);
 
 async function createStatuses() {
   try {
@@ -14,11 +22,11 @@ async function createStatuses() {
       { status_name: "delivered" },
       { status_name: "cancelled" }
     );
-    console.log(`Status data inserted`)
+    console.log(`Status data inserted`);
   } catch (err) {
     console.log(`Error inserting status data ${err}`);
   }
-};
+}
 
 createStatuses();
 
@@ -30,15 +38,4 @@ Status.sync()
     console.log(`error syncing Status Table ${err}`);
   });
 
-module.exports = Status
-
-
-/* module.exports = {
-  CREATE_TABLE: `DROP TABLE status IF EXISTS status CASCADE;
-    CREATE TABLE IF NOT EXISTS status(
-        status_id serial PRIMARY KEY,
-        status_name VARCHAR(30) NOT NULL
-    )
-    `,
-};
- */
+module.exports = Status;

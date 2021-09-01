@@ -1,12 +1,8 @@
 import express from "express";
 import bcrypt from "bcrypt";
 
-import pool from "../database/modelIndex";
-
 import { validateUserReg, validateUserLogin } from "../utils/validateUser";
 import { generateAuthToken } from "../utils/jwt";
-
-import { auth } from "../middleware/auth";
 
 import User from "../database/models/user";
 

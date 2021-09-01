@@ -1,8 +1,6 @@
 import express from "express";
 import {} from "sequelize";
 
-import pool from "../database/modelIndex";
-
 import User from "../database/models/user";
 import Parcel from "../database/models/parcel";
 
@@ -14,9 +12,6 @@ router.use(express.json());
 
 router.get("/allusers", async (req, res) => {
   try {
-    /* const { rows } = await pool.query(
-      "SELECT * FROM users ORDER BY user_id ASC"
-    ); */
     const users = await User.findAll();
     res.send(users);
   } catch (error) {

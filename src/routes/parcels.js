@@ -1,8 +1,7 @@
 import express from "express";
 
-import pool from "../database/modelIndex";
-
 import Parcel from "../database/models/parcel";
+import Status from "../database/models/status";
 
 import {
   validateParcelInfo,

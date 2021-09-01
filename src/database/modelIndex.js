@@ -7,9 +7,6 @@ const connectionString =
     ? process.env.TEST_DATABASE_URL
     : process.env.DATABASE_URL;
 
-// let connect = { connectionString,
-//     ssl: { rejectUnauthorized: false } };
-
 const sequelize = new Sequelize(connectionString);
 
 async function sequelizeConnect() {
