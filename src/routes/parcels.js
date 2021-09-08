@@ -15,7 +15,7 @@ import { admin } from "../middleware/admin";
 const router = express.Router();
 router.use(express.json());
 
-router.get("/", async (req, res) => {
+router.get("/", [auth, admin], async (req, res) => {
   try {
     const parcels = await Parcel.findAll();
     res.send(parcels);
