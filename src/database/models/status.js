@@ -1,5 +1,5 @@
 import { Sequelize, Model, DataTypes } from "sequelize";
-import sequelize from "../modelIndex";
+import sequelize from "../index";
 
 const Status = sequelize.define(
   "status",

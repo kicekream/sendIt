@@ -1,4 +1,3 @@
-// import { Pool } from "pg";
 import {} from "dotenv/config";
 import { Sequelize } from "sequelize";
 
@@ -19,7 +18,5 @@ async function sequelizeConnect() {
 }
 
 sequelizeConnect()
-
-// const pool = new Pool(connect);
 
 module.exports = sequelize;

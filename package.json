@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --watchAll --verbose --coverage --maxWorkers=1",
-    "build": "babel src -d dist",
-    "start": "nodemon --exec babel-node src/index.js",
+    "build": "rimraf /dist && babel src -d dist --copy-files",
+    "prod": "node dist/index.js",
+    "start": "npm run build && npm run prod",
     "heroku-postbuild": "npm install --production"
   },
   "engines": {
@@ -28,6 +29,7 @@
     "nodemon": "^2.0.12",
     "pg": "^8.7.1",
     "pg-hstore": "^2.3.4",
+    "rimraf": "^3.0.2",
     "sequelize": "^6.6.5",
     "swagger-ui-express": "^4.1.6"
   },
