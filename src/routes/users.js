@@ -58,7 +58,8 @@ router.put("/:userId/dakunmakemeadmin", auth, async(req, res)=>{
     );
 
     if (!rows[0])
-    return res.status(404).send("User with specified ID not found");
+    return res.status(404).send("User w// import models from "./models";
+    ith specified ID not found");
 
     if (req.user.user_id !== rows[0].user_id) {
       return res.status(403).send("Access denied.");

@@ -7,7 +7,8 @@ sendit-sequelize => This branch was forked from a the ready-made master. It uses
 
 API: icekream-sendit.herokuapp.com
 
-use the API documentation to view the available endpoints
-API Documentation: https://documenter.getpostman.com/view/6468654/Tzz8qwDJ
+Swagger API Documentation: icekream-sendit.herokuapp.com/api-docs
+
+Postman API Documentation: https://documenter.getpostman.com/view/6468654/Tzz8qwDJ
 
 Thanks.

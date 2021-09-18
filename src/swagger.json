@@ -1,0 +1,1328 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+      "title": "Sendit API",
+      "description": "SendIT is a courier service that helps users deliver parcels to different destinations.",
+      "version": "1.0.0"
+    },
+    "servers": [
+      {
+        "url": "localhost:3000/v1"
+      }
+    ],
+    "tags": [
+      {
+        "name": "parcels",
+        "description": "docs about parcel endpoints"
+      },
+      {
+        "name": "auth",
+        "description": "docs about user registration and login"
+      },
+      {
+        "name": "users",
+        "description": "docs about user endpoints"
+      }
+    ],
+    "paths": {
+      "/parcels": {
+        "get": {
+          "tags": [
+            "parcels"
+          ],
+          "summary": "Returns an array of all parcel data, authentication token is required in header",
+          "parameters": [
+            {
+              "name": "x-auth-token",
+              "in": "header",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "auth token generated on login or signup"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Response ok",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "properties": {
+                        "500": {
+                          "description": "Something failed"
+                        },
+                        "parcel_id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "receiver_name": {
+                          "type": "string",
+                          "example": "phyno"
+                        },
+                        "receiver_phone": {
+                          "type": "string",
+                          "example": "08012345678"
+                        },
+                        "parcel_origin": {
+                          "type": "string",
+                          "example": "Epe, Lagos"
+                        },
+                        "parcel_destination": {
+                          "type": "string",
+                          "example": "Akungba"
+                        },
+                        "parcel_note": {
+                          "type": "string",
+                          "example": "Test parcel"
+                        },
+                        "pickup_time": {
+                          "type": "string",
+                          "example": "2021-08-20T23:01:02.555Z"
+                        },
+                        "delivery_time": {
+                          "type": "string",
+                          "example": null
+                        },
+                        "cancel_time": {
+                          "type": "string",
+                          "example": null
+                        },
+                        "parcel_user_id": {
+                          "type": "integer",
+                          "example": 4
+                        },
+                        "parcel_status_id": {
+                          "type": "integer",
+                          "example": 4
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "tags": [
+            "parcels"
+          ],
+          "summary": "Create a new Parcel delivery order, authentication token is required in header",
+          "parameters": [
+            {
+              "name": "x-auth-token",
+              "in": "header",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "auth token generated on login or signup"
+            }
+          ],
+          "description": "Create parcel order",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "receiverName": {
+                      "type": "string"
+                    },
+                    "receiverPhone": {
+                      "type": "string"
+                    },
+                    "parcelOrigin": {
+                      "type": "string"
+                    },
+                    "parcelDestination": {
+                      "type": "string"
+                    },
+                    "parcelNote": {
+                      "type": "string",
+                      "description": "This field is optional"
+                    }
+                  },
+                  "example": {
+                    "receiverName": "Phyno",
+                    "receiverPhone": "08012345678",
+                    "parcelOrigin": "Epe, Lagos",
+                    "parcelNote": "Mess not with my connect"
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Parcel Order successfully created"
+            },
+            "400": {
+              "description": "Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "result": {
+                        "type": "string"
+                      },
+                      "error_code": {
+                        "type": "string"
+                      },
+                      "error_msg": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "400": {
+                      "summary": "error - 400",
+                      "value": {
+                        "result": "error",
+                        "error_code": 400,
+                        "error_msg": "Invalid/incomplete request body data"
+                      }
+                    },
+                    "401": {
+                      "summary": "error - 401",
+                      "value": {
+                        "result": "error",
+                        "error_code": 401,
+                        "error_msg": "Access denied, no token provided"
+                      }
+                    },
+                    "403": {
+                      "summary": "error - 403",
+                      "value": {
+                        "result": "error",
+                        "error_code": 403,
+                        "error_msg": "Access denied"
+                      }
+                    },
+                    "500": {
+                      "summary": "error - 500",
+                      "value": {
+                        "result": "error",
+                        "error_code": 500,
+                        "error_msg": "Something failed, internal server error"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/parcels/{parcelId}": {
+        "get": {
+          "tags": [
+            "parcels"
+          ],
+          "summary": "get single parcel data of ID provided",
+          "description": "Fetch parcel data of ID provided",
+          "parameters": [
+            {
+              "name": "parcelId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "example": 1,
+              "description": "parcelId"
+            },
+            {
+              "name": "x-auth-token",
+              "in": "header",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "auth token generated on login or signup"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "okay",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/getParcels"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "result": {
+                        "type": "string"
+                      },
+                      "error_code": {
+                        "type": "string"
+                      },
+                      "error_msg": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "401": {
+                      "summary": "error - 401",
+                      "value": {
+                        "result": "error",
+                        "error_code": 401,
+                        "error_msg": "Access denied, no token provided"
+                      }
+                    },
+                    "403": {
+                      "summary": "error - 403",
+                      "value": {
+                        "result": "error",
+                        "error_code": 403,
+                        "error_msg": "This action can only be performed by the User that created the order"
+                      }
+                    },
+                    "404": {
+                      "summary": "error - 404",
+                      "value": {
+                        "result": "error",
+                        "error_code": 404,
+                        "error_msg": "Parcel with specified ID not found"
+                      }
+                    },
+                    "500": {
+                      "summary": "error - 500",
+                      "value": {
+                        "result": "error",
+                        "error_code": 500,
+                        "error_msg": "Something failed, internal server error"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/parcels/{parcelId}/status": {
+        "put": {
+          "tags": [
+            "parcels"
+          ],
+          "summary": "Update delivery status of a parcel.",
+          "description": "Update parcel status by Id, can only be done by admin. 1 is pending, 2 is in-progress, 3 is delivered, 4 is cancelled",
+          "parameters": [
+            {
+              "name": "parcelId",
+              "in": "path",
+              "description": "Parcel ID of package that needs to be updated",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "example": 2
+              }
+            },
+            {
+              "name": "x-auth-token",
+              "in": "header",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "auth token generated on login or signup"
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "receiverName": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "parcelStatus": "2"
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Status updated successfully"
+            },
+            "400": {
+              "description": "Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "result": {
+                        "type": "string"
+                      },
+                      "error_code": {
+                        "type": "string"
+                      },
+                      "error_msg": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "400": {
+                      "summary": "error - 401",
+                      "value": {
+                        "result": "error",
+                        "error_code": 400,
+                        "error_msg": "Error updating parcel with specified id"
+                      }
+                    },
+                    "401": {
+                      "summary": "error - 401",
+                      "value": {
+                        "result": "error",
+                        "error_code": 401,
+                        "error_msg": "Access denied, no token provided"
+                      }
+                    },
+                    "404": {
+                      "summary": "error - 404",
+                      "value": {
+                        "result": "error",
+                        "error_code": 404,
+                        "error_msg": "Parcel with specified ID not found"
+                      }
+                    },
+                    "500": {
+                      "summary": "error - 500",
+                      "value": {
+                        "result": "error",
+                        "error_code": 500,
+                        "error_msg": "Error updating, something failed"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/parcels/{parcelId}/presentlocation": {
+        "put": {
+          "tags": [
+            "parcels"
+          ],
+          "summary": "Update present location of a parcel",
+          "description": "Update present location by Id, can only be done by admin",
+          "parameters": [
+            {
+              "name": "parcelId",
+              "in": "path",
+              "description": "Parcel ID of package that needs to be updated",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "example": 1
+              }
+            },
+            {
+              "name": "x-auth-token",
+              "in": "header",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "auth token generated on login or signup"
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "receiverName": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "presentLocation": "Adeola Odeku"
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Parcel location updated"
+            },
+            "400": {
+              "description": "Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "result": {
+                        "type": "string"
+                      },
+                      "error_code": {
+                        "type": "string"
+                      },
+                      "error_msg": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "400": {
+                      "summary": "error - 401",
+                      "value": {
+                        "result": "error",
+                        "error_code": 400,
+                        "error_msg": "Error updating parcel with specified id"
+                      }
+                    },
+                    "401": {
+                      "summary": "error - 401",
+                      "value": {
+                        "result": "error",
+                        "error_code": 401,
+                        "error_msg": "Access denied, no token provided"
+                      }
+                    },
+                    "404": {
+                      "summary": "error - 404",
+                      "value": {
+                        "result": "error",
+                        "error_code": 404,
+                        "error_msg": "Parcel with specified ID not found"
+                      }
+                    },
+                    "500": {
+                      "summary": "error - 500",
+                      "value": {
+                        "result": "error",
+                        "error_code": 500,
+                        "error_msg": "Error updating, something failed"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/parcels/{parcelId}/destination": {
+        "put": {
+          "tags": [
+            "parcels"
+          ],
+          "summary": "Update destination of a parcel",
+          "description": "Update parcel destination by Id, can be done by user and admin",
+          "parameters": [
+            {
+              "name": "parcelId",
+              "in": "path",
+              "description": "Parcel ID of package that needs to be updated",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "example": 1
+              }
+            },
+            {
+              "name": "x-auth-token",
+              "in": "header",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "auth token generated on login or signup"
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "receiverName": {
+                      "type": "string"
+                    }
+                  },
+                  "example": {
+                    "parcelDestination": "England"
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Parcel destination updated"
+            },
+            "400": {
+              "description": "Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "result": {
+                        "type": "string"
+                      },
+                      "error_code": {
+                        "type": "string"
+                      },
+                      "error_msg": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "400": {
+                      "summary": "error - 401",
+                      "value": {
+                        "result": "error",
+                        "error_code": 400,
+                        "error_msg": "Error updating parcel with specified id"
+                      }
+                    },
+                    "401": {
+                      "summary": "error - 401",
+                      "value": {
+                        "result": "error",
+                        "error_code": 401,
+                        "error_msg": "Access denied, no token provided"
+                      }
+                    },
+                    "404": {
+                      "summary": "error - 404",
+                      "value": {
+                        "result": "error",
+                        "error_code": 404,
+                        "error_msg": "Parcel with specified ID not found"
+                      }
+                    },
+                    "500": {
+                      "summary": "error - 500",
+                      "value": {
+                        "result": "error",
+                        "error_code": 500,
+                        "error_msg": "Error updating, something failed"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/parcels/{parcelId}/cancel": {
+        "put": {
+          "tags": [
+            "parcels"
+          ],
+          "summary": "Cancel parcel request",
+          "description": "Cancel parcel request by Id, can be done by user and admin",
+          "parameters": [
+            {
+              "name": "parcelId",
+              "in": "path",
+              "description": "Parcel ID of package that needs to be cancelled",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "example": 1
+              }
+            },
+            {
+              "name": "x-auth-token",
+              "in": "header",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "auth token generated on login or signup"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Parcel order cancelled",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "properties": {
+                        "500": {
+                          "description": "Something failed"
+                        },
+                        "parcel_id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "receiver_name": {
+                          "type": "string",
+                          "example": "phyno"
+                        },
+                        "receiver_phone": {
+                          "type": "string",
+                          "example": "08012345678"
+                        },
+                        "parcel_origin": {
+                          "type": "string",
+                          "example": "Epe, Lagos"
+                        },
+                        "parcel_destination": {
+                          "type": "string",
+                          "example": "Akungba"
+                        },
+                        "parcel_note": {
+                          "type": "string",
+                          "example": "Test parcel"
+                        },
+                        "pickup_time": {
+                          "type": "string",
+                          "example": "2021-08-20T23:01:02.555Z"
+                        },
+                        "delivery_time": {
+                          "type": "string",
+                          "example": null
+                        },
+                        "cancel_time": {
+                          "type": "string",
+                          "example": null
+                        },
+                        "parcel_user_id": {
+                          "type": "integer",
+                          "example": 4
+                        },
+                        "parcel_status_id": {
+                          "type": "integer",
+                          "example": 4
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "result": {
+                        "type": "string"
+                      },
+                      "error_code": {
+                        "type": "string"
+                      },
+                      "error_msg": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "400": {
+                      "summary": "error - 401",
+                      "value": {
+                        "result": "error",
+                        "error_code": 400,
+                        "error_msg": "Error updating parcel with specified id"
+                      }
+                    },
+                    "401": {
+                      "summary": "error - 401",
+                      "value": {
+                        "result": "error",
+                        "error_code": 401,
+                        "error_msg": "Access denied, no token provided"
+                      }
+                    },
+                    "404": {
+                      "summary": "error - 404",
+                      "value": {
+                        "result": "error",
+                        "error_code": 404,
+                        "error_msg": "Parcel with specified ID not found"
+                      }
+                    },
+                    "500": {
+                      "summary": "error - 500",
+                      "value": {
+                        "result": "error",
+                        "error_code": 500,
+                        "error_msg": "Error updating, something failed"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/auth/login": {
+        "post": {
+          "tags": [
+            "auth"
+          ],
+          "summary": "Login Existing user into the system",
+          "operationId": "loginUser",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string",
+                      "example": "abc@xyz.com"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "logged in",
+              "headers": {
+                "x-auth-token": {
+                  "description": "authentication token generated by jwt",
+                  "schema": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6Im9sdXNlZ3VuQGdtYWlsLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTYyOTUwMDgzN30.o1GkKsY8FJdfn3xJlNPDnRudu7Uyxsdpd0YqC-lOGuA"
+                  }
+                }
+              },
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "string",
+                    "example": "logged in"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "result": {
+                        "type": "string"
+                      },
+                      "error_code": {
+                        "type": "string"
+                      },
+                      "error_msg": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "400": {
+                      "summary": "error - 400",
+                      "value": {
+                        "result": "error",
+                        "error_code": 400,
+                        "error_msg": "Invalid email or password"
+                      }
+                    },
+                    "500": {
+                      "summary": "error - 500",
+                      "value": {
+                        "result": "error",
+                        "error_code": 500,
+                        "error_msg": "Something failed, internal server error"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/auth/signup": {
+        "post": {
+          "tags": [
+            "auth"
+          ],
+          "summary": "Registers and automatically logs in new user",
+          "operationId": "signup User",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "firstname": {
+                      "type": "string"
+                    },
+                    "lastname": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "type": "string",
+                      "example": "abc@xyz.com"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "signed up",
+              "headers": {
+                "x-auth-token": {
+                  "description": "authentication token generated by jwt",
+                  "schema": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6Im9sdXNlZ3VuQGdtYWlsLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTYyOTUwMDgzN30.o1GkKsY8FJdfn3xJlNPDnRudu7Uyxsdpd0YqC-lOGuA"
+                  }
+                }
+              },
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "string",
+                    "example": "signup successful"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "result": {
+                        "type": "string"
+                      },
+                      "error_code": {
+                        "type": "string"
+                      },
+                      "error_msg": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "400": {
+                      "summary": "error - 400",
+                      "value": {
+                        "result": "error",
+                        "error_code": 400,
+                        "error_msg": "User already exists or check registration details"
+                      }
+                    },
+                    "500": {
+                      "summary": "error - 500",
+                      "value": {
+                        "result": "error",
+                        "error_code": 500,
+                        "error_msg": "Something failed, internal server error"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/users/allusers": {
+        "get": {
+          "tags": [
+            "users"
+          ],
+          "summary": "Lists an array of all registered users",
+          "responses": {
+            "200": {
+              "description": "Response ok",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "properties": {
+                        "user_id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "firstname": {
+                          "type": "string",
+                          "example": "Ade"
+                        },
+                        "lastname": {
+                          "type": "string",
+                          "example": "phyno"
+                        },
+                        "email": {
+                          "type": "string",
+                          "example": "abc@xyz.com"
+                        },
+                        "password": {
+                          "type": "string",
+                          "example": "abcde"
+                        },
+                        "isadmin": {
+                          "type": "boolean",
+                          "example": false
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Something failed"
+            }
+          }
+        }
+      },
+      "/users/{userId}": {
+        "get": {
+          "tags": [
+            "users"
+          ],
+          "summary": "Fetches data for a specific user via the userId provided, authentication token is required in header",
+          "parameters": [
+            {
+              "name": "x-auth-token",
+              "in": "header",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "auth token generated on login or signup"
+            },
+            {
+              "name": "userId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "example": 1,
+              "description": "userId"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Response ok",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "user_id": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "firstname": {
+                        "type": "string",
+                        "example": "Ade"
+                      },
+                      "lastname": {
+                        "type": "string",
+                        "example": "phyno"
+                      },
+                      "email": {
+                        "type": "string",
+                        "example": "abc@xyz.com"
+                      },
+                      "password": {
+                        "type": "string",
+                        "example": "abcde"
+                      },
+                      "isadmin": {
+                        "type": "boolean",
+                        "example": false
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "User with specified ID not found"
+            },
+            "500": {
+              "description": "Something failed"
+            }
+          }
+        }
+      },
+      "/users/{userId}/parcels": {
+        "get": {
+          "tags": [
+            "users"
+          ],
+          "summary": "fetches all parcel data belonging to a user",
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "example": 1,
+              "description": "userId"
+            },
+            {
+              "name": "x-auth-token",
+              "in": "header",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "auth token generated on login or signup"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Response ok",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "properties": {
+                        "500": {
+                          "description": "Something failed"
+                        },
+                        "parcel_id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "receiver_name": {
+                          "type": "string",
+                          "example": "phyno"
+                        },
+                        "receiver_phone": {
+                          "type": "string",
+                          "example": "08012345678"
+                        },
+                        "parcel_origin": {
+                          "type": "string",
+                          "example": "Epe, Lagos"
+                        },
+                        "parcel_destination": {
+                          "type": "string",
+                          "example": "Akungba"
+                        },
+                        "parcel_note": {
+                          "type": "string",
+                          "example": "Test parcel"
+                        },
+                        "pickup_time": {
+                          "type": "string",
+                          "example": "2021-08-20T23:01:02.555Z"
+                        },
+                        "delivery_time": {
+                          "type": "string",
+                          "example": null
+                        },
+                        "cancel_time": {
+                          "type": "string",
+                          "example": null
+                        },
+                        "parcel_user_id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "parcel_status_id": {
+                          "type": "integer",
+                          "example": 4
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/users/{userId}/dakunmakemeadmin": {
+        "put": {
+          "tags": [
+            "users"
+          ],
+          "summary": "Grant admin role to a user",
+          "parameters": [
+            {
+              "name": "userId",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              },
+              "example": 1,
+              "description": "userId"
+            },
+            {
+              "name": "x-auth-token",
+              "in": "header",
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "auth token generated on login or signup"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Congrats, you are now an Admin"
+            },
+            "400": {
+              "description": "Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "result": {
+                        "type": "string"
+                      },
+                      "error_code": {
+                        "type": "string"
+                      },
+                      "error_msg": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "examples": {
+                    "400": {
+                      "summary": "error - 400",
+                      "value": {
+                        "result": "error",
+                        "error_code": 400,
+                        "error_msg": "Error fetching user with specified id"
+                      }
+                    },
+                    "403": {
+                      "summary": "error - 403",
+                      "value": {
+                        "result": "error",
+                        "error_code": 403,
+                        "error_msg": "Access denied"
+                      }
+                    },
+                    "404": {
+                      "summary": "error - 404",
+                      "value": {
+                        "result": "error",
+                        "error_code": 404,
+                        "error_msg": "user with specified ID not found"
+                      }
+                    },
+                    "500": {
+                      "summary": "error - 500",
+                      "value": {
+                        "result": "error",
+                        "error_code": 500,
+                        "error_msg": "Error updating, something failed"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "getParcels": {
+          "type": "object",
+          "properties": {
+            "parcel_id": {
+              "type": "integer",
+              "example": 1
+            },
+            "receiver_name": {
+              "type": "string",
+              "example": "phyno"
+            },
+            "receiver_phone": {
+              "type": "string",
+              "example": "08012345678"
+            },
+            "parcel_origin": {
+              "type": "string",
+              "example": "Epe, Lagos"
+            },
+            "parcel_destination": {
+              "type": "string",
+              "example": "Akungba"
+            },
+            "parcel_note": {
+              "type": "string",
+              "example": "Test parcel"
+            },
+            "pickup_time": {
+              "type": "string",
+              "example": "2021-08-20T23:01:02.555Z"
+            },
+            "delivery_time": {
+              "type": "string",
+              "example": null
+            },
+            "cancel_time": {
+              "type": "string",
+              "example": null
+            },
+            "parcel_user_id": {
+              "type": "integer",
+              "example": 4
+            },
+            "parcel_status_id": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        }
+      }
+    }
+  }

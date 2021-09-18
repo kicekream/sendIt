@@ -1,7 +1,6 @@
 import { Pool } from "pg";
 import {} from "dotenv/config";
 
-// import models from "./models";
 
 const string =
   process.env.NODE_ENV === "test"
