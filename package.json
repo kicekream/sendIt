@@ -7,8 +7,7 @@
     "test": "jest --watchAll --verbose --coverage --maxWorkers=1",
     "build": "rimraf /dist && babel src -d dist --copy-files",
     "prod": "node dist/index.js",
-    "start": "npm run build && npm run prod",
-    "heroku-postbuild": "npm install --production"
+    "start": "npm run build && npm run prod"
   },
   "engines": {
     "node": "12.18.3"
